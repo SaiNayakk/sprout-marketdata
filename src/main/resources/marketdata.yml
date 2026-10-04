@@ -1,0 +1,72 @@
+# Configuration for the market-data service. Named marketdata.yml (not application.yml) so it can
+# share a JVM host with other services without their settings colliding.
+spring:
+  application:
+    name: sprout-marketdata
+  jmx:
+    enabled: false
+  mvc:
+    async:
+      request-timeout: -1 # price streams stay open; heartbeats and failed writes end dead ones
+
+server:
+  port: ${MARKETDATA_PORT:8103}
+  address: ${MARKETDATA_BIND:127.0.0.1}
+  tomcat:
+    threads:
+      max: 16 # streams are asynchronous and don't hold these
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+  otlp:
+    metrics:
+      export:
+        enabled: ${OTEL_ENABLED:false}
+        url: ${OTEL_METRICS_URL:http://localhost:4318/v1/metrics}
+        step: 15s
+    tracing:
+      endpoint: ${OTEL_TRACES_URL:http://localhost:4318/v1/traces}
+  tracing:
+    enabled: ${OTEL_ENABLED:false}
+    sampling:
+      probability: 1.0
+  metrics:
+    tags:
+      service: sprout-marketdata
+
+logging:
+  structured:
+    format:
+      console: ${LOG_FORMAT:}
+  pattern:
+    correlation: "[%X{requestId:-}] "
+
+sprout:
+  marketdata:
+    # WALL: open 09:15-15:30 IST on weekdays, like the real market.
+    # ACCELERATED: runs at `speed` from `start-date` (default today), one session after another.
+    clock: ${MARKETDATA_CLOCK:WALL}
+    speed: ${MARKETDATA_SPEED:1}
+    start-date: ${MARKETDATA_START_DATE:}
+    pre-open: 1m          # market time shown as PRE_OPEN before 09:15
+    closed-pause: 20s     # ACCELERATED only: real seconds the market stays CLOSED between sessions
+    ticks-per-minute: 20  # average trades per instrument per minute (busier minutes get more)
+    catch-up-after: 5s    # further behind than this, skip ahead silently and resync clients
+    # Seed 12 was chosen from the first 80 for a believable broad market: about +38% from 2024 to
+    # October 2026 (roughly 12% a year), one correction of about 23%, and 15 of 20 stocks up, so
+    # there are losers to learn diversification from. Days after that are whatever the seed brings.
+    seed: ${MARKETDATA_SEED:12}
+    scenarios: {}         # e.g. { "2026-10-07": CRASH }
+    stream:
+      max-streams: ${MARKETDATA_MAX_STREAMS:1000}
+      max-symbols: 50
+      heartbeat: 15s
+    nats-url: ${MARKETDATA_NATS_URL:}
