@@ -14,7 +14,7 @@
   <!-- Released as git tags vX.Y.Z; hosts build a release from its tag (sprout-platform ADR-011). -->
   <groupId>com.github.SaiNayakk</groupId>
   <artifactId>sprout-marketdata</artifactId>
-  <version>0.1.1</version>
+  <version>0.1.2</version>
   <name>sprout-marketdata</name>
   <description>Instruments, quotes, candles and a live price stream for Sprout, replayed from recorded NSE days.</description>
 
