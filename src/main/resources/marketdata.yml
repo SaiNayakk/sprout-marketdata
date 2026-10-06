@@ -58,6 +58,9 @@ sprout:
     clock: ${MARKETDATA_CLOCK:WALL}
     speed: ${MARKETDATA_SPEED:1}
     start-date: ${MARKETDATA_START_DATE:}
+    # ACCELERATED, for a market that keeps going: the real instant (ISO, e.g. 2026-10-06T05:00:00Z) its first session began.
+    # With it (and a start-date) a restart or a reboot resumes where the market would be now; without it, a restart starts over.
+    epoch: ${MARKETDATA_EPOCH:}
     pre-open: 1m          # market time shown as PRE_OPEN before 09:15
     closed-pause: 20s     # ACCELERATED only: real seconds the market stays CLOSED between sessions
     ticks-per-minute: 20  # average trades per instrument per minute (busier minutes get more)

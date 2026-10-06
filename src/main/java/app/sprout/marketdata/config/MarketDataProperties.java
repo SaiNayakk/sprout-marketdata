@@ -3,6 +3,7 @@ package app.sprout.marketdata.config;
 import app.sprout.marketdata.domain.MarketEngine.ClockMode;
 import app.sprout.marketdata.domain.MarketSimulator.Scenario;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Map;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -14,6 +15,8 @@ public record MarketDataProperties(
         ClockMode clock,
         double speed,
         LocalDate startDate,
+        /* ACCELERATED: the real instant the first session began, so a restart resumes instead of starting over. Needs startDate. */
+        Instant epoch,
         Duration preOpen,
         Duration closedPause,
         int ticksPerMinute,

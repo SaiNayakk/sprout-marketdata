@@ -43,8 +43,19 @@ public final class MarketEngine {
 
     public enum ClockMode { ACCELERATED, WALL }
 
+    /**
+     * {@code epoch}: ACCELERATED only. The real instant the first session began (its pre-open), so a
+     * restarted engine resumes where the market would be now instead of starting over. Needs {@code startDate}.
+     */
     public record Settings(ClockMode clockMode, double speed, LocalDate startDate, Duration preOpen,
-                           Duration closedPause, int ticksPerMinute, Duration catchUpAfter) {}
+                           Duration closedPause, int ticksPerMinute, Duration catchUpAfter, Instant epoch) {
+
+        /** Without an epoch: the market begins when the engine starts. */
+        public Settings(ClockMode clockMode, double speed, LocalDate startDate, Duration preOpen, Duration closedPause,
+                        int ticksPerMinute, Duration catchUpAfter) {
+            this(clockMode, speed, startDate, preOpen, closedPause, ticksPerMinute, catchUpAfter, null);
+        }
+    }
 
     /** What readers see of the session. Replaced, never mutated. */
     private record SessionView(LocalDate date, Map<String, Bar[]> bars, Map<String, Double> prevClose,
@@ -93,11 +104,42 @@ public final class MarketEngine {
             LocalDate today = now.atZone(Model.IST).toLocalDate();
             LocalDate day = MarketSimulator.isTradingDay(today) ? today : previousTradingDay(today);
             load(day, now, now);
+        } else if (settings.epoch() != null) {
+            resume(now);
         } else {
             LocalDate start = MarketSimulator.onOrAfter(
                     settings.startDate() != null ? settings.startDate() : now.atZone(Model.IST).toLocalDate());
             load(start, now, Model.at(start, Model.OPEN).minus(settings.preOpen()));
         }
+    }
+
+    /**
+     * Sessions follow each other at a fixed period in real time (the pre-open and the session at
+     * {@code speed}, then the pause), so which session the market is in, and how far, follows from when it
+     * began. The engine loads that session at the moment it began and catches up silently to now.
+     */
+    private void resume(Instant now) {
+        if (settings.startDate() == null) {
+            throw new IllegalArgumentException("An epoch needs a start date: without one the market can't be placed again after a restart.");
+        }
+        LocalDate day = MarketSimulator.onOrAfter(settings.startDate());
+        Instant epoch = settings.epoch();
+        if (now.isBefore(epoch)) {
+            load(day, now, Model.at(day, Model.OPEN).minus(settings.preOpen()));   // not begun yet: start at the first session
+            return;
+        }
+        long period = sessionPeriod().toNanos();
+        long sessions = Duration.between(epoch, now).toNanos() / period;
+        for (long i = 0; i < sessions; i++) {
+            day = MarketSimulator.nextTradingDay(day);
+        }
+        load(day, epoch.plusNanos(sessions * period), Model.at(day, Model.OPEN).minus(settings.preOpen()));
+    }
+
+    /** Real time from one session's pre-open to the next's: pre-open and session at {@code speed}, then the closed pause. */
+    private Duration sessionPeriod() {
+        long marketNanos = settings.preOpen().toNanos() + Model.MINUTES_PER_SESSION * 60_000_000_000L;
+        return Duration.ofNanos((long) (marketNanos / settings.speed())).plus(settings.closedPause());
     }
 
     public void addListener(MarketListener l) {

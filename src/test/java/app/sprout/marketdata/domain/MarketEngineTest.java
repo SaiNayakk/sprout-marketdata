@@ -150,6 +150,44 @@ class MarketEngineTest {
     }
 
     @Test
+    void aRestartedMarketResumesWhereTheRunningOneIsInsteadOfStartingOver() {
+        Instant epoch = Instant.parse("2026-10-01T20:00:00Z");
+        MarketEngine.Settings settings = new MarketEngine.Settings(ClockMode.ACCELERATED, 600, FRI, Duration.ofMinutes(1),
+                Duration.ofSeconds(20), 20, Duration.ofSeconds(5), epoch);
+        MutableClock running = new MutableClock(epoch);
+        MarketEngine engine = new MarketEngine(sim, settings, running);
+        run(engine, running, Duration.ofSeconds(150));   // sessions last 57.6 s here: Fri, Mon, and a third of the way into Tue
+        assertThat(engine.market().sessionDate()).isEqualTo(LocalDate.of(2026, 10, 6));
+
+        MutableClock after = new MutableClock(running.instant());   // the process restarted: a new engine, the same moment
+        MarketEngine restarted = new MarketEngine(sim, settings, after);
+        restarted.advance(after.instant());
+        assertThat(restarted.market().sessionDate()).isEqualTo(engine.market().sessionDate());
+        assertThat(restarted.market().state()).isEqualTo(engine.market().state());
+        assertThat(Duration.between(restarted.market().marketTime(), engine.market().marketTime()).abs()).isLessThan(Duration.ofSeconds(2));
+        assertThat(restarted.quote("HARBOR").last()).as("the same price, not a replay of an old day").isEqualTo(engine.quote("HARBOR").last());
+        assertThat(restarted.quote("HARBOR").prevClose()).isEqualTo(engine.quote("HARBOR").prevClose());
+    }
+
+    @Test
+    void beforeItsEpochAMarketStartsAtItsFirstSession() {
+        Instant epoch = Instant.parse("2026-10-02T00:00:00Z");
+        MutableClock clock = new MutableClock(epoch.minusSeconds(30));
+        MarketEngine engine = new MarketEngine(sim, new MarketEngine.Settings(ClockMode.ACCELERATED, 600, FRI, Duration.ofMinutes(1),
+                Duration.ofSeconds(20), 20, Duration.ofSeconds(5), epoch), clock);
+        assertThat(engine.market().sessionDate()).isEqualTo(FRI);
+        assertThat(engine.market().state()).isEqualTo(MarketState.PRE_OPEN);
+    }
+
+    @Test
+    void anEpochWithoutAStartDateIsRefusedBecauseTheMarketCouldNotBePlacedAgain() {
+        MutableClock clock = new MutableClock(Instant.parse("2026-10-05T00:00:00Z"));
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> new MarketEngine(sim, new MarketEngine.Settings(ClockMode.ACCELERATED, 600,
+                null, Duration.ofMinutes(1), Duration.ofSeconds(20), 20, Duration.ofSeconds(5), Instant.parse("2026-10-01T00:00:00Z")), clock))
+                .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("start date");
+    }
+
+    @Test
     void wallClockFollowsRealIndianTime() {
         Instant monNoon = Model.at(MON, LocalTime.of(12, 0, 30));
         MutableClock clock = new MutableClock(monNoon);
