@@ -38,7 +38,7 @@ public class MarketDataBeans {
     MarketEngine engine(MarketSimulator sim, MarketDataProperties p, Clock clock, MeterRegistry meters) {
         long started = System.nanoTime();
         MarketEngine engine = new MarketEngine(sim, new MarketEngine.Settings(p.clock(), p.speed(), p.startDate(),
-                p.preOpen(), p.closedPause(), p.ticksPerMinute(), p.catchUpAfter()), clock);
+                p.preOpen(), p.closedPause(), p.ticksPerMinute(), p.catchUpAfter(), p.epoch()), clock);
         log.info("Market ready in {} ms: {}", (System.nanoTime() - started) / 1_000_000, engine.market());
         meters.gauge("md.engine.lag.ms", engine, e -> e.lag().toMillis());
         return engine;
