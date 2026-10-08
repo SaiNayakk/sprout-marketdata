@@ -60,7 +60,7 @@ public final class MarketSimulator {
             new Stock("NEURONET", "Neuronet Labs Ltd.", 1, 590, 0.42, 1.25, 4.8e6),
             new Stock("CLOUDLEAF", "Cloudleaf Software Ltd.", 1, 2240, 0.30, 1.00, 1.4e6),
             new Stock("MARIGOLD", "Marigold Foods Ltd.", 2, 2480, 0.17, 0.60, 0.9e6),
-            new Stock("CHAIWALA", "Chaiwala Beverages Ltd.", 2, 96.40, 0.35, 0.80, 2.1e7),
+            new Stock("BREWBERRY", "Brewberry Beverages Ltd.", 2, 96.40, 0.35, 0.80, 2.1e7),   // was CHAIWALA: same place, same prices
             new Stock("THREADS", "Monsoon Threads Ltd.", 2, 410, 0.33, 1.05, 3.3e6),
             new Stock("NIGHTOWL", "Night Owl Media Ltd.", 2, 158, 0.45, 1.20, 1.2e7),
             new Stock("TEALPWR", "Teal Power Ltd.", 3, 345, 0.27, 0.95, 7.7e6),
