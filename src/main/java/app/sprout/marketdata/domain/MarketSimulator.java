@@ -43,7 +43,7 @@ public final class MarketSimulator {
 
     public enum Scenario { NORMAL, TREND_UP, TREND_DOWN, VOLATILE, CRASH, RALLY }
 
-    /** A fictional listed company and how it behaves. */
+    /** A fictional listed company and how it behaves. Names are jokes; symbols never change, so holdings and history keep. */
     record Stock(String symbol, String name, int sector, double startPrice, double annualVol, double beta,
                  double dailyVolume) {}
 
@@ -51,26 +51,26 @@ public final class MarketSimulator {
             "Energy & Power", "Industrials & Materials"};
 
     private static final List<Stock> STOCKS = List.of(
-            new Stock("SAPLING", "Sapling Finance Ltd.", 0, 1450, 0.24, 1.10, 2.4e6),
-            new Stock("HARBOR", "Harbor Bank Ltd.", 0, 820, 0.22, 1.15, 6.5e6),
-            new Stock("LEDGERCO", "Ledger & Co. Insurance Ltd.", 0, 640, 0.20, 0.90, 1.8e6),
-            new Stock("KOSHA", "Kosha Capital Ltd.", 0, 215, 0.38, 1.30, 9.0e6),
-            new Stock("INKWELL", "Inkwell Systems Ltd.", 1, 3650, 0.22, 0.85, 1.1e6),
-            new Stock("BYTEFARM", "Bytefarm Technologies Ltd.", 1, 1480, 0.26, 0.90, 2.2e6),
-            new Stock("NEURONET", "Neuronet Labs Ltd.", 1, 590, 0.42, 1.25, 4.8e6),
-            new Stock("CLOUDLEAF", "Cloudleaf Software Ltd.", 1, 2240, 0.30, 1.00, 1.4e6),
-            new Stock("MARIGOLD", "Marigold Foods Ltd.", 2, 2480, 0.17, 0.60, 0.9e6),
-            new Stock("BREWBERRY", "Brewberry Beverages Ltd.", 2, 96.40, 0.35, 0.80, 2.1e7),   // was CHAIWALA: same place, same prices
-            new Stock("THREADS", "Monsoon Threads Ltd.", 2, 410, 0.33, 1.05, 3.3e6),
-            new Stock("NIGHTOWL", "Night Owl Media Ltd.", 2, 158, 0.45, 1.20, 1.2e7),
-            new Stock("TEALPWR", "Teal Power Ltd.", 3, 345, 0.27, 0.95, 7.7e6),
-            new Stock("SUNROOT", "Sunroot Renewables Ltd.", 3, 72.85, 0.50, 1.35, 3.1e7),
-            new Stock("DEEPWELL", "Deepwell Oil & Gas Ltd.", 3, 1290, 0.25, 1.00, 3.0e6),
-            new Stock("GRIDLINE", "Gridline Transmission Ltd.", 3, 298, 0.21, 0.75, 5.2e6),
-            new Stock("CHALK", "Chalk Cement Ltd.", 4, 11250, 0.21, 0.90, 2.0e5),
-            new Stock("IRONLEAF", "Ironleaf Steel Ltd.", 4, 152, 0.36, 1.30, 1.6e7),
-            new Stock("RAILYARD", "Railyard Logistics Ltd.", 4, 760, 0.29, 1.10, 2.6e6),
-            new Stock("AEROMINT", "Aeromint Defence Ltd.", 4, 4120, 0.34, 1.15, 7.0e5));
+            new Stock("SAPLING", "Sapling Money Tree Finance Ltd.", 0, 1450, 0.24, 1.10, 2.4e6),
+            new Stock("HARBOR", "Harbor Rainy Day Bank Ltd.", 0, 820, 0.22, 1.15, 6.5e6),
+            new Stock("LEDGERCO", "Ledger & Co. Fine Print Insurance Ltd.", 0, 640, 0.20, 0.90, 1.8e6),
+            new Stock("KOSHA", "Kosha Kal Pakka Capital Ltd.", 0, 215, 0.38, 1.30, 9.0e6),
+            new Stock("INKWELL", "Inkwell Works On My Machine Ltd.", 1, 3650, 0.22, 0.85, 1.1e6),
+            new Stock("BYTEFARM", "Bytefarm Free-Range Data Ltd.", 1, 1480, 0.26, 0.90, 2.2e6),
+            new Stock("NEURONET", "Neuronet Probably Sentient Labs Ltd.", 1, 590, 0.42, 1.25, 4.8e6),
+            new Stock("CLOUDLEAF", "Cloudleaf Someone Else's Computer Ltd.", 1, 2240, 0.30, 1.00, 1.4e6),
+            new Stock("MARIGOLD", "Marigold Midnight Snacks Ltd.", 2, 2480, 0.17, 0.60, 0.9e6),
+            new Stock("BREWBERRY", "Brewberry Second Cup Beverages Ltd.", 2, 96.40, 0.35, 0.80, 2.1e7),   // was CHAIWALA: same place, same prices
+            new Stock("THREADS", "Monsoon Threads Missing Sock Ltd.", 2, 410, 0.33, 1.05, 3.3e6),
+            new Stock("NIGHTOWL", "Night Owl One More Episode Media Ltd.", 2, 158, 0.45, 1.20, 1.2e7),
+            new Stock("TEALPWR", "Teal Power Off And On Again Ltd.", 3, 345, 0.27, 0.95, 7.7e6),
+            new Stock("SUNROOT", "Sunroot Cloudy Day Renewables Ltd.", 3, 72.85, 0.50, 1.35, 3.1e7),
+            new Stock("DEEPWELL", "Deepwell Dig Deeper Oil & Gas Ltd.", 3, 1290, 0.25, 1.00, 3.0e6),
+            new Stock("GRIDLINE", "Gridline Power Cut Transmission Ltd.", 3, 298, 0.21, 0.75, 5.2e6),
+            new Stock("CHALK", "Chalk Rock Solid Cement Ltd.", 4, 11250, 0.21, 0.90, 2.0e5),
+            new Stock("IRONLEAF", "Ironleaf Nerves of Steel Ltd.", 4, 152, 0.36, 1.30, 1.6e7),
+            new Stock("RAILYARD", "Railyard Running Late Logistics Ltd.", 4, 760, 0.29, 1.10, 2.6e6),
+            new Stock("AEROMINT", "Aeromint Paper Plane Defence Ltd.", 4, 4120, 0.34, 1.15, 7.0e5));
 
     private final long seed;
     private final Map<LocalDate, Scenario> forced;
